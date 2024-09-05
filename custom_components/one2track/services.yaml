@@ -1,1 +1,31 @@
 # TODO: Add service to push message
+#0048 : turn off
+#0039 : refresh location
+#0077 : update GPS interval (must have cmd_value: 300/600/3600)
+send_device_command:
+  description: "Refresh the device location for a specific device"
+  fields:
+    device_id:
+      description: "The ID of the device to refresh"
+      example: "123456789abcdef"
+      selector:
+        device:
+          integration: one2track  # Change 'one2track' to the actual integration domain of your component
+    cmd_code:
+      description: "The function cmd_code supported by One2Track web api"
+      example: "0039"
+      selector:
+        text:
+          multiline: false
+    cmd_value:
+      description: "The function cmd_value supported by One2Track web api"
+      example: "600"
+      selector:
+        text:
+          multiline: false
+    cmd_value_param:
+      description: "The function cmd_value_param supported by One2Track web api"
+      example: "function[cmd_value][]"
+      selector:
+        text:
+          multiline: false

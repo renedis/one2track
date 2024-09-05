@@ -16,7 +16,7 @@ from homeassistant.helpers.update_coordinator import (
 
 from .client import GpsClient, TrackerDevice
 from .common import (
-    DOMAIN, DEFAULT_UPDATE_RATE_MIN
+    DOMAIN, DEFAULT_UPDATE_RATE_SEC
 )
 
 LOGGER = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ class GpsCoordinator(DataUpdateCoordinator):
             # Name of the data. For logging purposes.
             name="One2Track",
             # Polling interval. Will only be polled if there are subscribers.
-            update_interval=timedelta(minutes=DEFAULT_UPDATE_RATE_MIN),
+            update_interval=timedelta(seconds=DEFAULT_UPDATE_RATE_SEC),
             always_update=False
         )
         self.gps_api = gps_api
@@ -76,9 +76,12 @@ class GpsCoordinator(DataUpdateCoordinator):
             # Note: asyncio.TimeoutError and aiohttp.ClientError are already
             # handled by the data update coordinator.
             async with async_timeout.timeout(300):
-                data = await (await self.hass.async_add_executor_job(
-                    self.gps_api.update
-                ))
+
+                #this caused issues in latest HA core?
+                #data = await (await self.hass.async_add_executor_job(
+                #    self.gps_api.update
+                #))
+                data = await self.gps_api.update()
 
                 LOGGER.debug("Update from the coordinator %s", data)
 
