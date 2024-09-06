@@ -103,6 +103,35 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         ),
     )
 
+    # Register the service
+    async def handle_send_device_message(call):
+        """Handle the service call to send_device_message."""
+        device_id   = call.data.get("device_id")
+        message     = call.data.get("message")
+        api_client  = hass.data[DOMAIN][entry.entry_id]["api_client"]
+
+        device = get_device(hass, device_id)
+        uuid = get_uuid_from_device(device)
+
+        LOGGER.error("handle_send_device_message")
+        LOGGER.error(api_client)
+
+        if api_client:
+            await api_client.send_device_message(uuid, message)
+
+    # Register the service with the schema
+    hass.services.async_register(
+        DOMAIN,
+        "send_device_message",
+        handle_send_device_message,
+        schema=vol.Schema(
+            {
+                vol.Required("device_id"): cv.string,
+                vol.Required("message"): cv.string,
+            }
+        ),
+    )
+
     for component in PLATFORMS:
         LOGGER.debug(f"[one2track] creating tracker for: {entry}")
         await hass.async_create_task(

@@ -13,12 +13,13 @@ from ..common import (
 
 _LOGGER = logging.getLogger(__name__)
 
+#https://www.one2trackgps.com/devices/0a078c6a-6433-4439-9e5e-5f9726e54f2a/messages | device_message[message]: test
 CONFIG = {
     "login_url": "https://www.one2trackgps.com/auth/users/sign_in",
     "base_url": "https://www.one2trackgps.com/",
     "device_url": "https://www.one2trackgps.com/users/%account%/devices",
-    "refresh_location_url": "https://www.one2trackgps.com/api/devices/%device%/functions",
     "api_function_url": "https://www.one2trackgps.com/api/devices/%uuid%/functions",
+    "message_url": "https://www.one2trackgps.com/devices/%uuid%/messages",
     "session_cookie": "_iadmin"
 }
 
@@ -186,20 +187,6 @@ class GpsClient():
             return []
 
     async def set_device_refresh_location(self, uuid):
-       #await self.get_csrf_nologin()
-
-       #post_data = {
-       #             "function[code]": "0039",
-       #             "authenticity_token": self.csrf,
-       #        }
-
-       #url = CONFIG["refresh_location_url"].replace("%account%", self.account_id).replace("%device%", uuid)
-
-       #response = await self.call_api(url, post_data)
-       #rawjson = await response.text()
-
-       #_LOGGER.debug("[refresh_location] raw json: %s %s", response.status, rawjson)
-
        await self.send_device_command(uuid, "0039")
 
        return True
@@ -230,6 +217,26 @@ class GpsClient():
 
        return True
 
+
+    async def send_device_message(self, uuid, message):
+       await self.get_csrf_nologin()
+
+       post_data = {
+                    "device_message[message]": message,
+                    "authenticity_token": self.csrf,
+               }
+
+       url = CONFIG["message_url"].replace("%uuid%", uuid)
+
+       _LOGGER.debug("[send_device_command] url: %s", url)
+       _LOGGER.debug("[send_device_command] post_data: %s", post_data)
+
+       response = await self.call_api(url, post_data)
+       rawjson = await response.text()
+
+       _LOGGER.debug("[send_device_command] response raw json: %s %s", response.status, rawjson)
+
+       return True
 
     async def close(self):
         await self.session.close()
