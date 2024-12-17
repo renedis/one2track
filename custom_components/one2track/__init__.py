@@ -16,8 +16,6 @@ from .common import (
     DOMAIN,
     LOGGER
 )
-from .device_tracker import One2TrackTracker
-from .sensor import One2TrackSensor
 
 PLATFORMS = [DEVICE_TRACKER]
 
@@ -42,7 +40,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = {'api_client': api}
 
-    # Import device tracker and sensors
+    # Import entities locally to prevent circular imports
+    from .device_tracker import One2TrackTracker
+    from .sensor import One2TrackSensor
+
     async def async_setup_platforms():
         coordinator = hass.data[DOMAIN][entry.entry_id]['api_client']
         devices = await coordinator.update()
