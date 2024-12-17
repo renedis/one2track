@@ -33,7 +33,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
     async_add_entities(sensors)
 
 class One2TrackSensor(CoordinatorEntity, SensorEntity):
-
     def __init__(self, coordinator, device, attribute, name, unit=None):
         super().__init__(coordinator)
         self._device = device
@@ -45,3 +44,13 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
     @property
     def state(self):
         return self._device["last_location"].get(self._attribute)
+
+    @property
+    def device_info(self):
+        return {
+            "identifiers": {(DOMAIN, self._device["name"])},
+            "name": f"One2Track {self._device['name']}",
+            "manufacturer": "One2Track",
+            "model": "GPS Tracker",
+            "sw_version": self._device.get("serial_number", "Unknown"),
+        }
