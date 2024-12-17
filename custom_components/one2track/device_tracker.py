@@ -5,13 +5,6 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
-async def async_setup_entry(hass, entry, async_add_entities):
-    """Set up One2Track device tracker entities."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]["api_client"]
-    devices = await coordinator.update()
-
-    async_add_entities([One2TrackTracker(coordinator, device) for device in devices])
-
 class One2TrackTracker(CoordinatorEntity, TrackerEntity):
     """Primary One2Track Tracker Entity."""
 
