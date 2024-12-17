@@ -16,10 +16,7 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
     @property
     def state(self):
         return self._device["last_location"].get(self._attribute)
-```
 
-**Updated `async_setup_entry` in `sensor.py`**
-```python
 async def async_setup_entry(hass, entry, async_add_entities):
     """Set up One2Track sensor entities."""
     coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
