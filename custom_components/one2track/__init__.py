@@ -2,7 +2,7 @@ import asyncio
 from requests import ConnectTimeout, HTTPError
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from datetime import timedelta
 from .client import get_client, One2TrackConfig
 from .common import (
@@ -12,7 +12,6 @@ from .common import (
     DOMAIN,
     LOGGER
 )
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 PLATFORMS = ["device_tracker", "sensor"]
 
@@ -38,17 +37,12 @@ class GpsCoordinator(DataUpdateCoordinator):
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up One2Track Data from a config entry."""
-    if DOMAIN not in hass.data:
-        hass.data[DOMAIN] = {}
-
     config = One2TrackConfig(username=entry.data[CONF_USER_NAME], password=entry.data[CONF_PASSWORD], id=entry.data[CONF_ID])
     api = get_client(config)
 
-    # Wrap the API client with GpsCoordinator
     coordinator = GpsCoordinator(hass, api)
     await coordinator.async_refresh()
-
-    hass.data[DOMAIN][entry.entry_id] = {"coordinator": coordinator}
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {"coordinator": coordinator}
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
