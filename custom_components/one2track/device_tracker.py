@@ -19,11 +19,11 @@ class One2TrackTracker(CoordinatorEntity, TrackerEntity):
 
     @property
     def latitude(self):
-        return self._device["last_location"]["latitude"]
+        return float(self._device["last_location"]["latitude"])
 
     @property
     def longitude(self):
-        return self._device["last_location"]["longitude"]
+        return float(self._device["last_location"]["longitude"])
 
     @property
     def battery_level(self):
@@ -53,4 +53,14 @@ class One2TrackTracker(CoordinatorEntity, TrackerEntity):
             "satellite_count": self._device["last_location"]["satellite_count"],
             "host": self._device["last_location"]["host"],
             "port": self._device["last_location"]["port"],
+        }
+
+    @property
+    def device_info(self):
+        return {
+            "identifiers": {(DOMAIN, self._device["uuid"])},
+            "name": f"One2Track {self._device['name']}",
+            "manufacturer": "One2Track",
+            "model": "GPS Kids Watch",
+            "sw_version": self._device.get("firmware_version", "Unknown"),
         }
