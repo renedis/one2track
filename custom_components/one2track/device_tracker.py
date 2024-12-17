@@ -28,9 +28,27 @@ class One2TrackTracker(CoordinatorEntity, TrackerEntity):
 
     @property
     def extra_state_attributes(self):
-        """Return only key attributes."""
+        """Return all key attributes."""
         return {
+            "bron": "One2Track",
+            "battery_level": self._device["last_location"]["battery_percentage"],
+            "breedtegraad": self._device["last_location"]["latitude"],
+            "lengtegraad": self._device["last_location"]["longitude"],
+            "gps_nauwkeurigheid": self._device["last_location"]["accuracy"],
+            "serial_number": self._device["serial_number"],
+            "uuid": self._device["uuid"],
+            "name": self._device["name"],
             "status": self._device["status"],
-            "signal_strength": self._device["last_location"]["signal_strength"],
+            "phone_number": self._device["phone_number"],
+            "tariff_type": self._device["simcard"]["tariff_type"],
+            "balance_cents": self._device["simcard"]["balance_cents"],
+            "last_communication": self._device["last_location"]["last_communication"],
+            "last_location_update": self._device["last_location"]["last_location_update"],
             "altitude": self._device["last_location"]["altitude"],
+            "location_type": self._device["last_location"]["location_type"],
+            "address": self._device["last_location"]["address"],
+            "signal_strength": self._device["last_location"]["signal_strength"],
+            "satellite_count": self._device["last_location"]["satellite_count"],
+            "host": self._device["last_location"]["host"],
+            "port": self._device["last_location"]["port"],
         }
