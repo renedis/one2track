@@ -16,7 +16,6 @@ from .common import (
 PLATFORMS = ["device_tracker", "sensor"]
 
 class GpsCoordinator(DataUpdateCoordinator):
-
     def __init__(self, hass, api_client):
         super().__init__(
             hass,
