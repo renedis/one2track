@@ -2,6 +2,21 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .common import DOMAIN
 
+async def async_setup_entry(hass, entry, async_add_entities):
+    """Set up One2Track sensor entities."""
+    coordinator = hass.data[DOMAIN][entry.entry_id]["api_client"]
+    devices = await coordinator.update()
+
+    sensors = []
+    for device in devices:
+        sensors.extend([
+            One2TrackSensor(coordinator, device, "battery_percentage", "Battery Level", "%"),
+            One2TrackSensor(coordinator, device, "signal_strength", "Signal Strength", "dBm"),
+            One2TrackSensor(coordinator, device, "altitude", "Altitude", "m"),
+            One2TrackSensor(coordinator, device, "accuracy", "GPS Accuracy", "m"),
+        ])
+    async_add_entities(sensors)
+
 class One2TrackSensor(CoordinatorEntity, SensorEntity):
     """One2Track Sensor Entity."""
 
