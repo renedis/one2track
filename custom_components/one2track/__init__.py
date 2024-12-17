@@ -16,10 +16,8 @@ from .common import (
 PLATFORMS = ["device_tracker", "sensor"]
 
 class GpsCoordinator(DataUpdateCoordinator):
-    """Coordinator to fetch and manage One2Track data."""
 
     def __init__(self, hass, api_client):
-        """Initialize the coordinator."""
         super().__init__(
             hass,
             LOGGER,
@@ -29,14 +27,12 @@ class GpsCoordinator(DataUpdateCoordinator):
         self.api_client = api_client
 
     async def _async_update_data(self):
-        """Fetch the latest data from the API."""
         try:
             return await self.api_client.update()
         except Exception as err:
             raise UpdateFailed(f"Error fetching data: {err}")
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Set up One2Track Data from a config entry."""
     config = One2TrackConfig(username=entry.data[CONF_USER_NAME], password=entry.data[CONF_PASSWORD], id=entry.data[CONF_ID])
     api = get_client(config)
 
@@ -48,7 +44,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     return True
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Unload a config entry."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id)
