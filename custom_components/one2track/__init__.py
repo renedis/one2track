@@ -16,6 +16,8 @@ from .common import (
     DOMAIN,
     LOGGER
 )
+from .device_tracker import One2TrackTracker
+from .sensor import One2TrackSensor
 
 PLATFORMS = [DEVICE_TRACKER]
 
