@@ -6,7 +6,6 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 class One2TrackTracker(CoordinatorEntity, TrackerEntity):
-    """Primary One2Track Tracker Entity."""
 
     def __init__(self, coordinator, device):
         super().__init__(coordinator)
@@ -28,7 +27,6 @@ class One2TrackTracker(CoordinatorEntity, TrackerEntity):
 
     @property
     def extra_state_attributes(self):
-        """Return all key attributes."""
         return {
             "bron": "One2Track",
             "battery_level": self._device["last_location"]["battery_percentage"],
