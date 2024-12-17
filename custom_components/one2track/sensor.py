@@ -3,7 +3,6 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .common import DOMAIN
 
 class One2TrackSensor(CoordinatorEntity, SensorEntity):
-    """One2Track Sensor Entity."""
 
     def __init__(self, coordinator, device, attribute, name, unit=None):
         super().__init__(coordinator)
@@ -18,7 +17,6 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
         return self._device["last_location"].get(self._attribute)
 
 async def async_setup_entry(hass, entry, async_add_entities):
-    """Set up One2Track sensor entities."""
     coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     devices = coordinator.data
 
