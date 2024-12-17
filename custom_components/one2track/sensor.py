@@ -8,7 +8,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
     sensors = []
     for device in devices:
-        name_prefix = f"{device['name']} Watch"
+        name_prefix = f"{device['name']} watch"
         sensors.extend([
             One2TrackSensor(coordinator, device, "battery_percentage", f"{name_prefix} Battery Level", "%"),
             One2TrackSensor(coordinator, device, "latitude", f"{name_prefix} Latitude", "°"),
