@@ -45,7 +45,7 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def state(self):
-        return self._device["last_location"].get(self._attribute, self._fallback)
+        return float(self._device["last_location"].get(self._attribute, 0))
 
     @property
     def device_info(self):
