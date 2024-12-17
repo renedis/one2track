@@ -1,10 +1,10 @@
 from datetime import timedelta
 import logging
 
-VERSION = "1.0.4"
+VERSION = "1.1.1"
 DOMAIN = "one2track"
 DEFAULT_PREFIX = "one2track"
-DEFAULT_UPDATE_RATE_SEC = 30
+DEFAULT_UPDATE_RATE_SEC = 60
 
 CHECK_TIME_DELTA = timedelta(hours=1, minutes=00)
 
