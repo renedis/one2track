@@ -2,21 +2,6 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .common import DOMAIN
 
-async def async_setup_entry(hass, entry, async_add_entities):
-    """Set up One2Track sensor entities."""
-    coordinator = hass.data[DOMAIN][entry.entry_id]["api_client"]
-    devices = await coordinator.update()
-
-    sensors = []
-    for device in devices:
-        sensors.extend([
-            One2TrackSensor(coordinator, device, "battery_percentage", "Battery Level", "%"),
-            One2TrackSensor(coordinator, device, "signal_strength", "Signal Strength", "dBm"),
-            One2TrackSensor(coordinator, device, "altitude", "Altitude", "m"),
-            One2TrackSensor(coordinator, device, "accuracy", "GPS Accuracy", "m"),
-        ])
-    async_add_entities(sensors)
-
 class One2TrackSensor(CoordinatorEntity, SensorEntity):
     """One2Track Sensor Entity."""
 
@@ -31,3 +16,37 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
     @property
     def state(self):
         return self._device["last_location"].get(self._attribute)
+```
+
+**Updated `async_setup_entry` in `sensor.py`**
+```python
+async def async_setup_entry(hass, entry, async_add_entities):
+    """Set up One2Track sensor entities."""
+    coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
+    devices = coordinator.data
+
+    sensors = []
+    for device in devices:
+        sensors.extend([
+            One2TrackSensor(coordinator, device, "battery_percentage", "Battery Level", "%"),
+            One2TrackSensor(coordinator, device, "latitude", "Breedtegraad", "°"),
+            One2TrackSensor(coordinator, device, "longitude", "Lengtegraad", "°"),
+            One2TrackSensor(coordinator, device, "accuracy", "GPS Nauwkeurigheid", "m"),
+            One2TrackSensor(coordinator, device, "altitude", "Altitude", "m"),
+            One2TrackSensor(coordinator, device, "signal_strength", "Signal Strength", "dBm"),
+            One2TrackSensor(coordinator, device, "satellite_count", "Satellite Count", None),
+            One2TrackSensor(coordinator, device, "address", "Address", None),
+            One2TrackSensor(coordinator, device, "location_type", "Location Type", None),
+            One2TrackSensor(coordinator, device, "last_communication", "Last Communication", None),
+            One2TrackSensor(coordinator, device, "last_location_update", "Last Location Update", None),
+            One2TrackSensor(coordinator, device, "phone_number", "Phone Number", None),
+            One2TrackSensor(coordinator, device, "serial_number", "Serial Number", None),
+            One2TrackSensor(coordinator, device, "uuid", "UUID", None),
+            One2TrackSensor(coordinator, device, "status", "Status", None),
+            One2TrackSensor(coordinator, device, "name", "Name", None),
+            One2TrackSensor(coordinator, device, "tariff_type", "Tariff Type", None),
+            One2TrackSensor(coordinator, device, "balance_cents", "Balance Cents", "cents"),
+            One2TrackSensor(coordinator, device, "host", "Host", None),
+            One2TrackSensor(coordinator, device, "port", "Port", None),
+        ])
+    async_add_entities(sensors)
