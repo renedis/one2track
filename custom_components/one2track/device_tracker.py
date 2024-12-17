@@ -5,8 +5,12 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
-class One2TrackTracker(CoordinatorEntity, TrackerEntity):
+async def async_setup_entry(hass, entry, async_add_entities):
+    coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
+    devices = coordinator.data
+    async_add_entities([One2TrackTracker(coordinator, device) for device in devices])
 
+class One2TrackTracker(CoordinatorEntity, TrackerEntity):
     def __init__(self, coordinator, device):
         super().__init__(coordinator)
         self._device = device
