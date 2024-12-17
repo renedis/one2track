@@ -3,11 +3,7 @@ from requests import ConnectTimeout, HTTPError
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-from homeassistant.components.device_tracker import DOMAIN as DEVICE_TRACKER
-from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
-import voluptuous as vol
-
 from .client import get_client, One2TrackConfig
 from .common import (
     CONF_USER_NAME,
@@ -17,11 +13,10 @@ from .common import (
     LOGGER
 )
 
-PLATFORMS = [DEVICE_TRACKER]
+PLATFORMS = ["device_tracker", "sensor"]
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up One2Track Data from a config entry."""
-
     if DOMAIN not in hass.data:
         hass.data[DOMAIN] = {}
 
@@ -34,57 +29,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         raise ConfigEntryNotReady from ex
 
     if account_id != entry.data[CONF_ID]:
-        LOGGER.error(f"Unexpected initial account id: {account_id}. Expected: {entry.data[CONF_ID]}")
+        LOGGER.error(f"Unexpected account id: {account_id}. Expected: {entry.data[CONF_ID]}")
         raise ConfigEntryNotReady
 
-    hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][entry.entry_id] = {'api_client': api}
+    hass.data[DOMAIN][entry.entry_id] = {"api_client": api}
 
-    # Import entities locally to prevent circular imports
-    from .device_tracker import One2TrackTracker
-    from .sensor import One2TrackSensor
-
-    async def async_setup_platforms():
-        coordinator = hass.data[DOMAIN][entry.entry_id]['api_client']
-        devices = await coordinator.update()
-        entities = [
-            One2TrackTracker(coordinator, device) for device in devices
-        ]
-        
-        attributes = {
-            "battery_percentage": ("Battery Level", "%"),
-            "signal_strength": ("Signal Strength", "dBm"),
-            "altitude": ("Altitude", "m"),
-            "gps_nauwkeurigheid": ("GPS Accuracy", "m"),
-        }
-
-        for device in devices:
-            for attribute, (name, unit) in attributes.items():
-                entities.append(One2TrackSensor(coordinator, device, attribute, name, unit))
-
-        hass.async_create_task(hass.config_entries.async_forward_entry_setup(entry, "sensor"))
-
-    await async_setup_platforms()
-
-    for component in PLATFORMS:
-        LOGGER.debug(f"[one2track] creating tracker for: {entry}")
-        await hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(entry, component)
-        )
-
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload a config entry."""
-    unload_ok = all(
-        await asyncio.gather(
-            *[
-                hass.config_entries.async_forward_entry_unload(entry, component)
-                for component in PLATFORMS
-            ]
-        )
-    )
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id)
-
     return unload_ok
