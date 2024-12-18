@@ -70,7 +70,7 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
         if attribute == "balance_cents":
             self._attr_device_class = "valuta"
             
-        if attribute in ["uuid", "port", "host", "latitude", "longitude", "accuracy", "tariff_type"]:
+        if attribute in ["uuid", "port", "host", "latitude", "longitude", "accuracy", "tariff_type", "name", "status"]:
             self._attr_entity_registry_enabled_default = False
 
     @property
