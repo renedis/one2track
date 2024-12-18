@@ -16,7 +16,6 @@ class One2TrackTracker(CoordinatorEntity, TrackerEntity):
         self._device = device
         self._attr_unique_id = f"one2track_tracker_{device['uuid']}"
         self._attr_name = f"One2Track {device['name']}"
-        self._attr_icon = "mdi:map-marker"
 
     @property
     def latitude(self):
@@ -38,7 +37,22 @@ class One2TrackTracker(CoordinatorEntity, TrackerEntity):
             "breedtegraad": self._device["last_location"].get("latitude"),
             "lengtegraad": self._device["last_location"].get("longitude"),
             "gps_nauwkeurigheid": self._device["last_location"].get("accuracy"),
+            "serial_number": self._device.get("serial_number"),
+            "uuid": self._device.get("uuid"),
+            "name": self._device.get("name"),
             "status": self._device.get("status"),
+            "phone_number": self._device.get("phone_number"),
+            "tariff_type": self._device["simcard"].get("tariff_type"),
+            "balance_cents": self._device["simcard"].get("balance_cents"),
+            "last_communication": self._device["last_location"].get("last_communication"),
+            "last_location_update": self._device["last_location"].get("last_location_update"),
+            "altitude": self._device["last_location"].get("altitude"),
+            "location_type": self._device["last_location"].get("location_type"),
+            "address": self._device["last_location"].get("address"),
+            "signal_strength": self._device["last_location"].get("signal_strength"),
+            "satellite_count": self._device["last_location"].get("satellite_count"),
+            "host": self._device["last_location"].get("host"),
+            "port": self._device["last_location"].get("port"),
         }
 
     @property
