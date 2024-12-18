@@ -10,7 +10,8 @@ from .common import (
     CONF_PASSWORD,
     CONF_ID,
     DOMAIN,
-    LOGGER
+    LOGGER,
+    DEFAULT_UPDATE_RATE_SEC
 )
 
 PLATFORMS = ["device_tracker", "sensor"]
@@ -21,7 +22,7 @@ class GpsCoordinator(DataUpdateCoordinator):
             hass,
             LOGGER,
             name="One2Track Coordinator",
-            update_interval=timedelta(seconds=30),
+            update_interval=timedelta(seconds=DEFAULT_UPDATE_RATE_SEC),
         )
         self.api_client = api_client
 
@@ -32,7 +33,11 @@ class GpsCoordinator(DataUpdateCoordinator):
             raise UpdateFailed(f"Error fetching data: {err}")
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    config = One2TrackConfig(username=entry.data[CONF_USER_NAME], password=entry.data[CONF_PASSWORD], id=entry.data[CONF_ID])
+    config = One2TrackConfig(
+        username=entry.data[CONF_USER_NAME],
+        password=entry.data[CONF_PASSWORD],
+        id=entry.data[CONF_ID]
+    )
     api = get_client(config)
 
     coordinator = GpsCoordinator(hass, api)
