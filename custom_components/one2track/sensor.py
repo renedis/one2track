@@ -73,18 +73,20 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
         if attribute in ["uuid", "port", "host", "latitude", "longitude", "accuracy", "tariff_type", "name", "status"]:
             self._attr_entity_registry_enabled_default = False
 
-    @property
+   @property
     def state(self):
-        return self._device["last_location"].get(self._attribute, self._fallback)
-
-        if self._attr_device_class == "timestamp" and value:
-            return value.isoformat() if hasattr(value, "isoformat") else value
-        
         if self._attribute == "balance_cents":
             balance_cents = self._device["simcard"].get(self._attribute, 0)
-            return balance_cents / 100 if balance_cents is not None else None
-        
-        return value
+            if balance_cents is not None:
+                return round(balance_cents / 100, 2) 
+            return None
+
+        if self._attr_device_class == "timestamp":
+            value = self._device["last_location"].get(self._attribute, self._fallback)
+            return value.isoformat() if hasattr(value, "isoformat") else value
+
+        return self._device["last_location"].get(self._attribute, self._fallback)
+    
     @property
     def device_info(self):
         return {
