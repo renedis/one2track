@@ -1,6 +1,9 @@
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .common import DOMAIN
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 ICON_MAPPING = {
     "battery_percentage": "mdi:battery",
@@ -27,6 +30,7 @@ ICON_MAPPING = {
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
+    LOGGER.debug(f"Coordinator data structure: {coordinator.data}")
     devices = coordinator.data
 
     sensors = []
@@ -91,14 +95,24 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
         }
         return device_class_mapping.get(attribute)
 
+    def _get_device_data(self):
+        if isinstance(self.coordinator.data, list):
+            for device_data in self.coordinator.data:
+                if device_data.get("uuid") == self._device["uuid"]:
+                    return device_data
+        elif isinstance(self.coordinator.data, dict):
+            return self.coordinator.data.get(self._device["uuid"], {})
+        return {}
+
     @property
     def state(self):
+        device_data = self._get_device_data()
         if self._attribute == "balance_cents":
-            balance_cents = self.coordinator.data[self._device["uuid"]].get("simcard", {}).get(self._attribute, 0)
+            balance_cents = device_data.get("simcard", {}).get(self._attribute, 0)
             if balance_cents is not None:
                 return round(balance_cents / 100, 2)
             return None
-        return self.coordinator.data[self._device["uuid"]]["last_location"].get(self._attribute, self._fallback)
+        return device_data.get("last_location", {}).get(self._attribute, self._fallback)
 
     @property
     def device_info(self):
