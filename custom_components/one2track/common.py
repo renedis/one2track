@@ -4,7 +4,7 @@ import logging
 VERSION = "1.1.3"
 DOMAIN = "one2track"
 DEFAULT_PREFIX = "one2track"
-DEFAULT_UPDATE_RATE_SEC = 60
+DEFAULT_UPDATE_RATE_SEC = 30
 
 CHECK_TIME_DELTA = timedelta(hours=1, minutes=00)
 
