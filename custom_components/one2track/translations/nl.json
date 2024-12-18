@@ -1,0 +1,22 @@
+{
+    "title": "One2Track GPS horloges",
+    "config": {
+        "step": {
+            "user": {
+                "title": "One2Track Inloggegevens",
+                "data": {
+                    "Username": "Gebruikersnaam",
+                    "Password": "Wachtwoord"
+                },
+                "description": "Voer de gebruikersnaam en het wachtwoord in die worden gebruikt in de One2Track-app of op de website."
+            }
+        },
+        "error": {
+            "already_configured": "Apparaat is al geconfigureerd",
+            "authentication_error": "Ongeldige gebruikersnaam of wachtwoord. Controleer dit aub op www.one2trackgps.com/"
+        },
+        "abort": {
+            "already_configured": "Apparaat is al geconfigureerd"
+        }
+    }
+}
