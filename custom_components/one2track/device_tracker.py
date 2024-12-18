@@ -49,4 +49,5 @@ class One2TrackTracker(CoordinatorEntity, TrackerEntity):
             "manufacturer": "One2Track",
             "model": "GPS Tracker",
             "sw_version": self._device.get("serial_number", "Unknown"),
+            "icon": "mdi:watch",
         }
