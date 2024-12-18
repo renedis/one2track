@@ -20,7 +20,7 @@ ICON_MAPPING = {
     "status": "mdi:information",
     "name": "mdi:label",
     "tariff_type": "mdi:sim",
-    "balance_cents": "mdi:currency-eur",
+    "balance_cents": "mdi:currency-usd",
     "host": "mdi:server-network",
     "port": "mdi:ethernet"
 }
@@ -64,11 +64,12 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
         self._attr_name = f"{name}"
         self._attr_unique_id = f"one2track_{device['uuid']}_{attribute}"
         self._attr_unit_of_measurement = unit
+        self._attr_icon = ICON_MAPPING.get(attribute, "mdi:information-outline")
         self._fallback = fallback
 
     @property
     def state(self):
-        return self._device["last_location"].get(self._attribute, self._fallback)
+        return self._device["last_location"].get(self._attribute)
 
     @property
     def device_info(self):
