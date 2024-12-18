@@ -66,19 +66,19 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
         self._attr_unit_of_measurement = unit
         self._fallback = fallback
         self._attr_icon = ICON_MAPPING.get(attribute, "mdi:information-outline")
-        
+
         if attribute == "balance_cents":
             self._attr_device_class = "valuta"
-            
+
         if attribute in ["uuid", "port", "host", "latitude", "longitude", "accuracy", "tariff_type", "name", "status"]:
             self._attr_entity_registry_enabled_default = False
 
-   @property
+    @property
     def state(self):
         if self._attribute == "balance_cents":
             balance_cents = self._device["simcard"].get(self._attribute, 0)
             if balance_cents is not None:
-                return round(balance_cents / 100, 2) 
+                return round(balance_cents / 100, 2)
             return None
 
         if self._attr_device_class == "timestamp":
@@ -86,12 +86,17 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
             return value.isoformat() if hasattr(value, "isoformat") else value
 
         return self._device["last_location"].get(self._attribute, self._fallback)
-    
+
     @property
     def device_info(self):
         return {
             "identifiers": {(DOMAIN, self._device["name"])},
             "name": f"One2Track {self._device['name']}",
+            "manufacturer": "One2Track",
+            "model": "GPS watch",
+            "sw_version": self._device.get("serial_number", "Unknown"),
+        }
+
             "manufacturer": "One2Track",
             "model": "GPS watch",
             "sw_version": self._device.get("serial_number", "Unknown"),
