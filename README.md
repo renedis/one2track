@@ -1,4 +1,4 @@
-# One2Track GPS trackers
+# One2Track GPS watch
 Integration to get One2Track watches/trackers information from the [web portal](https://www.one2trackgps.com/auth/users/sign_in)
 
 ## Current features:
