@@ -106,6 +106,6 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
             "identifiers": {(DOMAIN, self._device["name"])},
             "name": f"One2Track {self._device['name']}",
             "manufacturer": "One2Track",
-            "model": "GPS Tracker",
+            "model": "GPS watch",
             "sw_version": self._device.get("serial_number", "Unknown"),
         }
