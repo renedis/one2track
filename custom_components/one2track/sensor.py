@@ -33,12 +33,12 @@ async def async_setup_entry(hass, entry, async_add_entities):
     for device in devices:
         name_prefix = f"{device['name']} watch"
         sensors.extend([
-            One2TrackSensor(coordinator, device, "battery_percentage", f"{name_prefix} Battery Level", "%", "battery"),
-            One2TrackSensor(coordinator, device, "latitude", f"{name_prefix} Latitude", "°", "distance"),
-            One2TrackSensor(coordinator, device, "longitude", f"{name_prefix} Longitude", "°", "distance"),
+            One2TrackSensor(coordinator, device, "battery_percentage", f"{name_prefix} Battery Level", "%"),
+            One2TrackSensor(coordinator, device, "latitude", f"{name_prefix} Latitude", "°"),
+            One2TrackSensor(coordinator, device, "longitude", f"{name_prefix} Longitude", "°"),
             One2TrackSensor(coordinator, device, "accuracy", f"{name_prefix} GPS accuracy", "m", fallback=device.get("accuracy")),
-            One2TrackSensor(coordinator, device, "altitude", f"{name_prefix} Altitude", "m", "distance"),
-            One2TrackSensor(coordinator, device, "signal_strength", f"{name_prefix} Signal Strength", "dBm", "signal_strength"),
+            One2TrackSensor(coordinator, device, "altitude", f"{name_prefix} Altitude", "m"),
+            One2TrackSensor(coordinator, device, "signal_strength", f"{name_prefix} Signal Strength", "dBm"),
             One2TrackSensor(coordinator, device, "satellite_count", f"{name_prefix} Satellite Count", None),
             One2TrackSensor(coordinator, device, "address", f"{name_prefix} Address", None),
             One2TrackSensor(coordinator, device, "location_type", f"{name_prefix} Location Type", None),
@@ -64,12 +64,12 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
         self._attr_name = f"{name}"
         self._attr_unique_id = f"one2track_{device['uuid']}_{attribute}"
         self._attr_unit_of_measurement = unit
-        self._attr_icon = ICON_MAPPING.get(attribute, "mdi:information-outline")
         self._fallback = fallback
+        self._attr_icon = ICON_MAPPING.get(attribute, "mdi:information-outline")
 
     @property
     def state(self):
-        return self._device["last_location"].get(self._attribute)
+        return self._device["last_location"].get(self._attribute, self._fallback)
 
     @property
     def device_info(self):
