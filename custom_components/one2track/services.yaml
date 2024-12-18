@@ -11,7 +11,7 @@ send_device_command:
       example: "123456789abcdef"
       selector:
         device:
-          integration: one2track  # Change 'one2track' to the actual integration domain of your component
+          integration: one2track
     cmd_code:
       description: "The function cmd_code supported by One2Track web api"
       example: "0039"
@@ -31,7 +31,7 @@ send_device_command:
         text:
           multiline: false
 send_device_message:
-  name: "Send Message to Device"  # Friendly name for the service
+  name: "Send Message to Device"
   description: "Send a message to a specific device"
   fields:
     device_id:
@@ -39,7 +39,7 @@ send_device_message:
       example: "123456789abcdef"
       selector:
         device:
-          integration: one2track  # Change 'one2track' to the actual integration domain of your component
+          integration: one2track
     message:
       description: "The message to send"
       example: "Hi!"
