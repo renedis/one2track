@@ -68,6 +68,12 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
         self._attr_icon = ICON_MAPPING.get(attribute, "mdi:information-outline")
         self._attr_device_class = self._get_device_class(attribute)
 
+        if self._attr_device_class == "enum":
+            if attribute == "location_type":
+                self._attr_options = ["WIFI", "GPS"]
+            elif attribute == "status":
+                self._attr_options = ["WIFI", "GPS"]
+
         if attribute in ["uuid", "port", "host", "latitude", "longitude", "accuracy", 
                          "tariff_type", "name", "status", "last_communication", 
                          "last_location_update"]:
@@ -80,6 +86,8 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
             "last_communication": "timestamp",
             "last_location_update": "timestamp",
             "balance_cents": "monetary",
+            "location_type": "enum",
+            "status": "enum",
         }
         return device_class_mapping.get(attribute)
 
