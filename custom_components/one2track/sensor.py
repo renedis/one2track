@@ -83,9 +83,11 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
 
         if self._attr_device_class == "timestamp":
             value = self._device["last_location"].get(self._attribute, self._fallback)
-            return value.isoformat() if hasattr(value, "isoformat") else value
+            if value:
+                return value.isoformat() if hasattr(value, "isoformat") else value
+            return None
 
-        return self._device["last_location"].get(self._attribute, self._fallback)
+        return self._device.get(self._attribute, self._fallback)
 
     @property
     def device_info(self):
