@@ -20,7 +20,7 @@ ICON_MAPPING = {
     "status": "mdi:information",
     "name": "mdi:label",
     "tariff_type": "mdi:sim",
-    "balance_cents": "mdi:currency-usd",
+    "balance_cents": "mdi:currency-eur",
     "host": "mdi:server-network",
     "port": "mdi:ethernet"
 }
@@ -42,15 +42,15 @@ async def async_setup_entry(hass, entry, async_add_entities):
             One2TrackSensor(coordinator, device, "satellite_count", f"{name_prefix} Satellite Count", None),
             One2TrackSensor(coordinator, device, "address", f"{name_prefix} Address", None),
             One2TrackSensor(coordinator, device, "location_type", f"{name_prefix} Location Type", None),
-            One2TrackSensor(coordinator, device, "last_communication", f"{name_prefix} Last communication", None),
-            One2TrackSensor(coordinator, device, "last_location_update", f"{name_prefix} Last location update", None),
+            One2TrackSensor(coordinator, device, "last_communication", f"{name_prefix} Last communication", None, "timestamp"),
+            One2TrackSensor(coordinator, device, "last_location_update", f"{name_prefix} Last location update", None, "timestamp"),
             One2TrackSensor(coordinator, device, "phone_number", f"{name_prefix} Phone number", None, fallback=device.get("phone_number")),
             One2TrackSensor(coordinator, device, "serial_number", f"{name_prefix} Serial number", None, fallback=device.get("serial_number")),
             One2TrackSensor(coordinator, device, "uuid", f"{name_prefix} UUID", None, fallback=device.get("uuid")),
             One2TrackSensor(coordinator, device, "status", f"{name_prefix} Status", None, fallback=device.get("status")),
             One2TrackSensor(coordinator, device, "name", f"{name_prefix} Name", None, fallback=device.get("name")),
-            One2TrackSensor(coordinator, device, "tariff_type", f"{name_prefix} Tariff Type", None, fallback=device["simcard"].get("tariff_type")),
-            One2TrackSensor(coordinator, device, "balance_cents", f"{name_prefix} Balance Cents", "cents", fallback=device["simcard"].get("balance_cents")),
+            One2TrackSensor(coordinator, device, "tariff_type", f"{name_prefix} SIM type", None, fallback=device["simcard"].get("tariff_type")),
+            One2TrackSensor(coordinator, device, "balance_cents", f"{name_prefix} Balance", fallback=device["simcard"].get("balance_cents")),
             One2TrackSensor(coordinator, device, "host", f"{name_prefix} Host", None),
             One2TrackSensor(coordinator, device, "port", f"{name_prefix} Port", None),
         ])
@@ -66,17 +66,31 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
         self._attr_unit_of_measurement = unit
         self._fallback = fallback
         self._attr_icon = ICON_MAPPING.get(attribute, "mdi:information-outline")
+        
+        if attribute == "balance_cents":
+            self._attr_device_class = "valuta"
+            
+        if attribute in ["uuid", "port", "host", "latitude", "longitude", "accuracy", "tariff_type"]:
+            self._attr_entity_registry_enabled_default = False
 
     @property
     def state(self):
         return self._device["last_location"].get(self._attribute, self._fallback)
 
+        if self._attr_device_class == "timestamp" and value:
+            return value.isoformat() if hasattr(value, "isoformat") else value
+        
+        if self._attribute == "balance_cents":
+            balance_cents = self._device["simcard"].get(self._attribute, 0)
+            return balance_cents / 100 if balance_cents is not None else None
+        
+        return value
     @property
     def device_info(self):
         return {
             "identifiers": {(DOMAIN, self._device["name"])},
             "name": f"One2Track {self._device['name']}",
             "manufacturer": "One2Track",
-            "model": "GPS Tracker",
+            "model": "GPS watch",
             "sw_version": self._device.get("serial_number", "Unknown"),
         }
