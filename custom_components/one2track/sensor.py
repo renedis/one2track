@@ -54,7 +54,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
             One2TrackSensor(coordinator, device, "host", f"{name_prefix} Host", None),
             One2TrackSensor(coordinator, device, "port", f"{name_prefix} Port", None),
         ])
-    async_add_entities(sensors)
+    async_add_entities(sensors, update_before_add=True)
 
 class One2TrackSensor(CoordinatorEntity, SensorEntity):
     def __init__(self, coordinator, device, attribute, name, unit=None, fallback=None):
@@ -94,11 +94,11 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
     @property
     def state(self):
         if self._attribute == "balance_cents":
-            balance_cents = self._device.get("simcard", {}).get(self._attribute, 0)
+            balance_cents = self.coordinator.data[self._device["uuid"]].get("simcard", {}).get(self._attribute, 0)
             if balance_cents is not None:
                 return round(balance_cents / 100, 2)
             return None
-        return self._device.get("last_location", {}).get(self._attribute, self._fallback)
+        return self.coordinator.data[self._device["uuid"]]["last_location"].get(self._attribute, self._fallback)
 
     @property
     def device_info(self):
