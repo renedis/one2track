@@ -66,6 +66,7 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
         self._attr_unit_of_measurement = unit
         self._fallback = fallback
         self._attr_icon = ICON_MAPPING.get(attribute, "mdi:information-outline")
+        self._attr_device_class = None
 
         if attribute == "balance_cents":
             self._attr_device_class = "valuta"
