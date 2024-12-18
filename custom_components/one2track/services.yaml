@@ -3,7 +3,7 @@
 #0039 : refresh location
 #0077 : update GPS interval (must have cmd_value: 300/600/3600)
 send_device_command:
-  name: "Send Command to Device"  # Friendly name for the service
+  name: "Send Command to Device"
   description: "Send a specific command to a device"
   fields:
     device_id:
