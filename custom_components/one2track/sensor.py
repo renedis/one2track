@@ -67,6 +67,12 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
         self._fallback = fallback
         self._attr_icon = ICON_MAPPING.get(attribute, "mdi:information-outline")
 
+        if attribute == "balance_cents":
+            self._attr_device_class = "valuta"
+
+        if attribute in ["uuid", "port", "host", "latitude", "longitude", "accuracy", "tariff_type", "name", "status"]:
+            self._attr_entity_registry_enabled_default = False
+
     @property
     def state(self):
         return self._device["last_location"].get(self._attribute, self._fallback)
