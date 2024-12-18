@@ -8,7 +8,7 @@ LOGGER = logging.getLogger(__name__)
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     devices = coordinator.data
-    async_add_entities([One2TrackTracker(coordinator, device) for device in devices])
+    async_add_entities([One2TrackTracker(coordinator, device) for device in devices], update_before_add=True)
 
 class One2TrackTracker(CoordinatorEntity, TrackerEntity):
     def __init__(self, coordinator, device):
@@ -19,20 +19,20 @@ class One2TrackTracker(CoordinatorEntity, TrackerEntity):
 
     @property
     def latitude(self):
-        return float(self._device["last_location"].get("latitude", 0.0))
+        return float(self.coordinator.data[self._device["uuid"]]["last_location"].get("latitude", 0.0))
 
     @property
     def longitude(self):
-        return float(self._device["last_location"].get("longitude", 0.0))
+        return float(self.coordinator.data[self._device["uuid"]]["last_location"].get("longitude", 0.0))
 
     @property
     def battery_level(self):
-        return self._device["last_location"].get("battery_percentage")
+        return self.coordinator.data[self._device["uuid"]]["last_location"].get("battery_percentage")
 
     @property
     def extra_state_attributes(self):
+        device_data = self.coordinator.data[self._device["uuid"]]["last_location"]
         return {
-            "bron": "One2Track",
             "battery_level": self._device["last_location"].get("battery_percentage"),
             "breedtegraad": self._device["last_location"].get("latitude"),
             "lengtegraad": self._device["last_location"].get("longitude"),
