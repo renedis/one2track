@@ -36,7 +36,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
             One2TrackSensor(coordinator, device, "battery_percentage", f"{name_prefix} Battery Level", "%", "battery"),
             One2TrackSensor(coordinator, device, "latitude", f"{name_prefix} Latitude", "°", "distance"),
             One2TrackSensor(coordinator, device, "longitude", f"{name_prefix} Longitude", "°", "distance"),
-            One2TrackSensor(coordinator, device, "accuracy", f"{name_prefix} GPS accuracy", "m", fallback=device.get("accuracy"), "distance"),
+            One2TrackSensor(coordinator, device, "accuracy", f"{name_prefix} GPS accuracy", "m", "distance", fallback=device.get("accuracy")),
             One2TrackSensor(coordinator, device, "altitude", f"{name_prefix} Altitude", "m", "distance"),
             One2TrackSensor(coordinator, device, "signal_strength", f"{name_prefix} Signal Strength", "dBm", "signal_strength"),
             One2TrackSensor(coordinator, device, "satellite_count", f"{name_prefix} Satellite Count", None),
