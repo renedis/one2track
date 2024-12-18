@@ -13,7 +13,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
             One2TrackSensor(coordinator, device, "battery_percentage", f"{name_prefix} Battery Level", "%"),
             One2TrackSensor(coordinator, device, "latitude", f"{name_prefix} Latitude", "°"),
             One2TrackSensor(coordinator, device, "longitude", f"{name_prefix} Longitude", "°"),
-            One2TrackSensor(coordinator, device, "accuracy", f"{name_prefix} GPS accuracy", "m"),
+            One2TrackSensor(coordinator, device, "accuracy", f"{name_prefix} GPS accuracy", "m", is_float=True, fallback=device.get("accuracy")),
             One2TrackSensor(coordinator, device, "altitude", f"{name_prefix} Altitude", "m"),
             One2TrackSensor(coordinator, device, "signal_strength", f"{name_prefix} Signal Strength", "dBm"),
             One2TrackSensor(coordinator, device, "satellite_count", f"{name_prefix} Satellite Count", None),
@@ -45,7 +45,7 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def state(self):
-        return float(self._device["last_location"].get(self._attribute, 0))
+        return self._device["last_location"].get(self._attribute, self._fallback)
 
     @property
     def device_info(self):
