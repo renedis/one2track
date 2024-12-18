@@ -24,3 +24,6 @@ The best method is using HACS (https://hacs.xyz)
 5.  Reboot HA
 6.  In HA goto Config -> Integrations. Add the One2Track to HA
 7.  Enter your username and password
+
+# Example
+![Example](https://community-assets.home-assistant.io/original/4X/8/1/3/813fb34f4f0613381a3467cd35833b3b00de2657.png)
