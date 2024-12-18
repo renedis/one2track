@@ -9,8 +9,11 @@ Integration to get One2Track watches/trackers information from the [web portal](
 
 ## Feature roadmap (PRs welcome)
  - Add services:
-   - Send message
-   - Force update
+   - Send message (through Home Assistant notify)
+   - Force update button
+   - Set Signal strength sensor to show graph instead of numeric
+   - Set Satellite count sensor to show graph instead of numeric
+   - Set Altitude sensor to show graph instead of numeric
 
 # Installation
 The best method is using HACS (https://hacs.xyz)
