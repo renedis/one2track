@@ -96,8 +96,3 @@ class One2TrackSensor(CoordinatorEntity, SensorEntity):
             "model": "GPS watch",
             "sw_version": self._device.get("serial_number", "Unknown"),
         }
-
-            "manufacturer": "One2Track",
-            "model": "GPS watch",
-            "sw_version": self._device.get("serial_number", "Unknown"),
-        }
