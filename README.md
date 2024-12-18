@@ -15,7 +15,7 @@ Integration to get One2Track watches/trackers information from the [web portal](
    - Set Satellite count sensor to show graph instead of numeric
    - Set Altitude sensor to show graph instead of numeric
    - Set logo's
-   - Set Dutch language and English (base work done)
+   - Set Dutch and English language files (base work done)
    - Optimise naming of sensors
 
 # Installation
