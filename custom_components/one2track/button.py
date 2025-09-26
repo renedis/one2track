@@ -1,6 +1,3 @@
-"""Button platform for One2Track integration."""
-from __future__ import annotations
-
 import logging
 from typing import Any
 
@@ -11,7 +8,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .common import DOMAIN
-from .coordinator import GpsCoordinator
+from . import GpsCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
