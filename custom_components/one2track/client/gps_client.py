@@ -191,6 +191,10 @@ class GpsClient():
 
        return True
 
+    async def force_gps_update(self, uuid: str):
+    """Explicit alias for sending the '0039' force GPS update command."""
+    return await self.set_device_refresh_location(uuid)
+    
     async def send_device_command(self, uuid, cmd_code, cmd_value=None, cmd_value_param=None):
        await self.get_csrf_nologin()
 
