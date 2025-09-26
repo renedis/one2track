@@ -14,7 +14,8 @@ from .common import (
     DEFAULT_UPDATE_RATE_SEC
 )
 
-PLATFORMS = ["device_tracker", "sensor"]
+#PLATFORMS = ["device_tracker", "sensor"]
+PLATFORMS = ["device_tracker", "sensor", "button"]
 
 class GpsCoordinator(DataUpdateCoordinator):
     def __init__(self, hass, api_client):
