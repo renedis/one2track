@@ -57,6 +57,7 @@ class UpdateLocationButton(CoordinatorEntity, ButtonEntity):
     """Button to trigger GPS update (API call 0039) for a One2Track device."""
     
     _attr_icon = "mdi:crosshairs-gps"
+    _attr_entity_registry_enabled_default = True
     
     def __init__(self, coordinator: GpsCoordinator, device_id: str, device_data: Dict[str, Any]) -> None:
         super().__init__(coordinator)
@@ -91,6 +92,7 @@ class PowerOffDeviceButton(CoordinatorEntity, ButtonEntity):
     """Button to power off a One2Track device (API call 0048)."""
     
     _attr_icon = "mdi:power"
+    _attr_entity_registry_enabled_default = True
     
     def __init__(self, coordinator: GpsCoordinator, device_id: str, device_data: Dict[str, Any]) -> None:
         super().__init__(coordinator)
