@@ -1,7 +1,7 @@
 from datetime import timedelta
 import logging
 
-VERSION = "1.2.5"
+VERSION = "1.2.6"
 DOMAIN = "one2track"
 DEFAULT_PREFIX = "one2track"
 DEFAULT_UPDATE_RATE_SEC = 60
