@@ -8,12 +8,11 @@ from .client_types import (
     AuthenticationError
 )
 from ..common import (
-     VERSION
+    VERSION
 )
 
 _LOGGER = logging.getLogger(__name__)
 
-#https://www.one2trackgps.com/devices/0a078c6a-6433-4439-9e5e-5f9726e54f2a/messages | device_message[message]: test
 CONFIG = {
     "login_url": "https://www.one2trackgps.com/auth/users/sign_in",
     "base_url": "https://www.one2trackgps.com/",
@@ -22,7 +21,6 @@ CONFIG = {
     "message_url": "https://www.one2trackgps.com/devices/%uuid%/messages",
     "session_cookie": "_iadmin"
 }
-
 
 class GpsClient():
     config: One2TrackConfig
@@ -79,16 +77,15 @@ class GpsClient():
 
         if self.session is None:
             self.session = ClientSession()
-
-        self.session.cookie_jar.clear()
+            self.session.cookie_jar.clear()
 
         if data is not None:
             return await self.session.post(url,
-                                           data=data,
-                                           headers=headers,
-                                           allow_redirects=allow_redirects,
-                                           cookies=cookies
-                                           )
+                                         data=data,
+                                         headers=headers,
+                                         allow_redirects=allow_redirects,
+                                         cookies=cookies
+                                         )
         else:
             return await self.session.get(url, headers=headers, allow_redirects=allow_redirects, cookies=cookies)
 
@@ -96,7 +93,6 @@ class GpsClient():
         cookie = ""
         if 'Set-Cookie' in response.headers:
             cookie = response.headers['Set-Cookie']
-
         if cookie:
             return response.headers['Set-Cookie'].split(CONFIG["session_cookie"])[1].split(";")[
                 0].replace("=", "")
@@ -115,11 +111,10 @@ class GpsClient():
             "gdpr": "1",
             "user[remember_me]": "1",
         }
-        response = await self.call_api(CONFIG["login_url"], data=login_data, allow_redirects=False)
 
+        response = await self.call_api(CONFIG["login_url"], data=login_data, allow_redirects=False)
         _LOGGER.debug("[login] Status: %s", response.status)
 
-        # login is successful when we get a fresh cookie
         if response.status == 302 and "Set-Cookie" in response.headers:
             _LOGGER.debug("[login] login success!")
             self.cookie = self.parse_cookie(response)
@@ -157,19 +152,15 @@ class GpsClient():
         try:
             devices = await self.get_device_data()
             return devices
-
         except AuthenticationError:
             _LOGGER.warning("login failed")
             self.cookie = ""
             self.csrf = ""
-            # hopefully next update loop login will be better
 
     async def get_device_data(self):
         url = CONFIG["device_url"].replace("%account%", self.account_id)
         response = await self.call_api(url, use_json=True)
         rawjson = await response.text()
-
-        #_LOGGER.debug("[devices] raw json: %s %s", response.status, rawjson)
 
         if response.status == 200:
             try:
@@ -180,67 +171,60 @@ class GpsClient():
                 return None
         else:
             _LOGGER.error(f"[one2track][error][update] Cant get devices updated: code: %s message: %s", response.status,
-                          rawjson)
+                         rawjson)
             self.cookie = ""
             self.csrf = ""
-            # hopefully next update loop login will be better
             return []
 
     async def set_device_refresh_location(self, uuid):
-       await self.send_device_command(uuid, "0039")
-
-       return True
+        await self.send_device_command(uuid, "0039")
+        return True
 
     async def force_gps_update(self, uuid: str):
-    """Explicit alias for sending the '0039' force GPS update command."""
-    return await self.set_device_refresh_location(uuid)
-    
+        """Explicit alias for sending the '0039' force GPS update command."""
+        return await self.set_device_refresh_location(uuid)
+
     async def send_device_command(self, uuid, cmd_code, cmd_value=None, cmd_value_param=None):
-       await self.get_csrf_nologin()
+        await self.get_csrf_nologin()
 
-       post_data = {
-                    "function[code]": cmd_code,
-                    "authenticity_token": self.csrf,
-               }
+        post_data = {
+            "function[code]": cmd_code,
+            "authenticity_token": self.csrf,
+        }
 
-       if(cmd_value):
+        if(cmd_value):
             if(cmd_value_param):
                 post_data[cmd_value_param] = cmd_value
             else:
                 post_data["function[cmd_value][]"] = cmd_value
 
-       url = CONFIG["api_function_url"].replace("%account%", self.account_id).replace("%uuid%", uuid)
+        url = CONFIG["api_function_url"].replace("%account%", self.account_id).replace("%uuid%", uuid)
+        _LOGGER.debug("[send_device_command] url: %s", url)
+        _LOGGER.debug("[send_device_command] post_data: %s", post_data)
 
-       _LOGGER.debug("[send_device_command] url: %s", url)
-       _LOGGER.debug("[send_device_command] post_data: %s", post_data)
+        response = await self.call_api(url, post_data)
+        rawjson = await response.text()
+        _LOGGER.debug("[send_device_command] response raw json: %s %s", response.status, rawjson)
 
-       response = await self.call_api(url, post_data)
-       rawjson = await response.text()
-
-       _LOGGER.debug("[send_device_command] response raw json: %s %s", response.status, rawjson)
-
-       return True
-
+        return True
 
     async def send_device_message(self, uuid, message):
-       await self.get_csrf_nologin()
+        await self.get_csrf_nologin()
 
-       post_data = {
-                    "device_message[message]": message,
-                    "authenticity_token": self.csrf,
-               }
+        post_data = {
+            "device_message[message]": message,
+            "authenticity_token": self.csrf,
+        }
 
-       url = CONFIG["message_url"].replace("%uuid%", uuid)
+        url = CONFIG["message_url"].replace("%uuid%", uuid)
+        _LOGGER.debug("[send_device_command] url: %s", url)
+        _LOGGER.debug("[send_device_command] post_data: %s", post_data)
 
-       _LOGGER.debug("[send_device_command] url: %s", url)
-       _LOGGER.debug("[send_device_command] post_data: %s", post_data)
+        response = await self.call_api(url, post_data)
+        rawjson = await response.text()
+        _LOGGER.debug("[send_device_command] response raw json: %s %s", response.status, rawjson)
 
-       response = await self.call_api(url, post_data)
-       rawjson = await response.text()
-
-       _LOGGER.debug("[send_device_command] response raw json: %s %s", response.status, rawjson)
-
-       return True
+        return True
 
     async def close(self):
         await self.session.close()
