@@ -63,21 +63,18 @@ class UpdateLocationButton(CoordinatorEntity, ButtonEntity):
         self._attr_unique_id = f"one2track_{device_id}_update_location"
 
         self._attr_device_info = {
-            "identifiers": {(DOMAIN, device_id)},
-            "name": device_data.get("name", "One2Track Device"),
+            "identifiers": {(DOMAIN, device_data["name"])},
+            "name": f"One2Track {device_data['name']}",
             "manufacturer": "One2Track",
-            "model": device_data.get("model", "GPS Watch"),
-            "sw_version": device_data.get("firmware_version"),
+            "model": "GPS watch",
+            "sw_version": device_data.get("serial_number", "Unknown"),
         }
 
     async def async_press(self) -> None:
         """Handle the button press: trigger API call '0039'."""
         try:
             _LOGGER.debug("Sending '0039' Update Location for device %s", self._device_id)
-
-            # Clean, explicit method name:
             await self.coordinator.api_client.force_gps_update(self._device_id)
-
             _LOGGER.info("Update Location (0039) sent for device %s", self._device_id)
             await self.coordinator.async_request_refresh()
         except Exception as err:
