@@ -58,7 +58,7 @@ class ForceRefreshLocationButton(CoordinatorEntity, ButtonEntity):
         """Handle the button press."""
         try:
             _LOGGER.debug("Force refresh requested for device %s", self._device_id)
-            await self.coordinator.api_client.call_function(self._device_id, "0039")
+            await self.coordinator.api_client.set_device_refresh_location(self._device_id)
             _LOGGER.info("Force refresh command sent for device %s", self._device_id)
         except Exception as err:
             _LOGGER.error("Failed to send force refresh command: %s", err)
