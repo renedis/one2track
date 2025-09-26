@@ -32,8 +32,8 @@ class One2TrackTracker(CoordinatorEntity, TrackerEntity):
             return self.coordinator.data.get(self._device["uuid"], {})
         return {}
 
-    def _handle_coordinator_update(self) -> None:
-        """Only update HA state if relevant location fields changed."""
+    async def async_write_ha_state(self):
+        """Only write HA state when location fields changed."""
         device_data = self._get_device_data()
         loc = device_data.get("last_location", {})
 
@@ -49,7 +49,9 @@ class One2TrackTracker(CoordinatorEntity, TrackerEntity):
             self._last_lat = lat
             self._last_lon = lon
             self._last_address = addr
-            super()._handle_coordinator_update()
+            await super().async_write_ha_state()
+        else:
+            return
 
     @property
     def latitude(self):
