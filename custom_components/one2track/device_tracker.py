@@ -5,11 +5,13 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
+
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
-    LOGGER.debug(f"Coordinator data structure: {coordinator.data}")  # Log the structure of coordinator data
+    LOGGER.debug(f"Coordinator data structure: {coordinator.data}")
     devices = coordinator.data
     async_add_entities([One2TrackTracker(coordinator, device) for device in devices], update_before_add=True)
+
 
 class One2TrackTracker(CoordinatorEntity, TrackerEntity):
     def __init__(self, coordinator, device):
@@ -17,9 +19,11 @@ class One2TrackTracker(CoordinatorEntity, TrackerEntity):
         self._device = device
         self._attr_unique_id = f"one2track_tracker_{device['uuid']}"
         self._attr_name = f"One2Track {device['name']}"
+        self._last_lat = None
+        self._last_lon = None
+        self._last_address = None
 
     def _get_device_data(self):
-        # Safely retrieve device data
         if isinstance(self.coordinator.data, list):
             for device_data in self.coordinator.data:
                 if device_data.get("uuid") == self._device["uuid"]:
@@ -27,6 +31,25 @@ class One2TrackTracker(CoordinatorEntity, TrackerEntity):
         elif isinstance(self.coordinator.data, dict):
             return self.coordinator.data.get(self._device["uuid"], {})
         return {}
+
+    def _handle_coordinator_update(self) -> None:
+        """Only update HA state if relevant location fields changed."""
+        device_data = self._get_device_data()
+        loc = device_data.get("last_location", {})
+
+        lat = float(loc.get("latitude", 0.0))
+        lon = float(loc.get("longitude", 0.0))
+        addr = loc.get("address")
+
+        if (
+            self._last_lat != lat
+            or self._last_lon != lon
+            or self._last_address != addr
+        ):
+            self._last_lat = lat
+            self._last_lon = lon
+            self._last_address = addr
+            super()._handle_coordinator_update()
 
     @property
     def latitude(self):
