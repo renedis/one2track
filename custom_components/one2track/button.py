@@ -68,7 +68,7 @@ class UpdateLocationButton(CoordinatorEntity, ButtonEntity):
         self._attr_unique_id = f"one2track_{device_id}_update_location"
         
         self._attr_device_info = {
-            "identifiers": {(DOMAIN, device_id)},
+            "identifiers": {(DOMAIN, device_data["name"])},
             "name": f"One2Track {name}",
             "manufacturer": "One2Track",
             "model": "GPS watch",
@@ -102,7 +102,7 @@ class PowerOffDeviceButton(CoordinatorEntity, ButtonEntity):
         self._attr_unique_id = f"one2track_{device_id}_power_off"
         
         self._attr_device_info = {
-            "identifiers": {(DOMAIN, device_id)},
+            "identifiers": {(DOMAIN, device_data["name"])},
             "name": f"One2Track {name}",
             "manufacturer": "One2Track",
             "model": "GPS watch",
