@@ -2,7 +2,7 @@
 Integration to get One2Track watches/trackers information from the [web portal](https://www.one2trackgps.com/auth/users/sign_in)
 
 ## Current features:
- - Single device with a device tracker and multiple sensors
+ - Single device with a device tracker, multiple sensors and buttons.
  - Attributes in device tracker is used as source
  - Detects HA zones
  - Detects multiple devices in your account
@@ -10,7 +10,6 @@ Integration to get One2Track watches/trackers information from the [web portal](
 ## Feature roadmap (PRs welcome)
  - Add services:
    - Send message (through Home Assistant notify)
-   - Force update button
    - Set Signal strength sensor to show graph instead of numeric
    - Set Satellite count sensor to show graph instead of numeric
    - Set Altitude sensor to show graph instead of numeric
