@@ -2,6 +2,7 @@ import json
 import logging
 from typing import List
 from aiohttp import ClientSession
+from yarl import URL
 from .client_types import (
     TrackerDevice,
     One2TrackConfig,
@@ -36,6 +37,31 @@ class GpsClient():
 
     def set_account_id(self, account_id):
         self.account_id = account_id
+
+    def reset_session(self):
+        """Forget the current (expired) session before logging in again.
+
+        After a single failed device request self.cookie is cleared, but the
+        ClientSession still holds the session cookie in its cookie jar and
+        keeps sending it. The server sees a live session, sets no new cookie
+        and answers the login POST with a 302 without Set-Cookie, so login()
+        failed on every poll until the integration was reloaded.
+        """
+        self.cookie = ""
+        self.csrf = ""
+        if self.session is not None:
+            self.session.cookie_jar.clear()
+
+    def session_cookie(self, response) -> str:
+        """Session cookie from the response, or else from the cookie jar."""
+        name = CONFIG["session_cookie"]
+        if name in response.cookies:
+            return response.cookies[name].value
+        if self.session is not None:
+            jar = self.session.cookie_jar.filter_cookies(URL(CONFIG["base_url"]))
+            if name in jar:
+                return jar[name].value
+        return ""
 
     async def get_csrf(self):
         login_page = await self.call_api(CONFIG["login_url"])
@@ -115,13 +141,18 @@ class GpsClient():
         response = await self.call_api(CONFIG["login_url"], data=login_data, allow_redirects=False)
         _LOGGER.debug("[login] Status: %s", response.status)
 
-        if response.status == 302 and "Set-Cookie" in response.headers:
+        location = response.headers.get("Location", "")
+        cookie = self.session_cookie(response) if response.status == 302 else ""
+
+        # a failed login redirects back to the sign-in page
+        if response.status == 302 and cookie and "sign_in" not in location:
             _LOGGER.debug("[login] login success!")
-            self.cookie = self.parse_cookie(response)
+            self.cookie = cookie
             _LOGGER.debug(f"[login] Found this cookie: {self.cookie}")
-            _LOGGER.debug(f"[login] Found this redirect: {response.headers['Location']}")
+            _LOGGER.debug(f"[login] Found this redirect: {location}")
         else:
             _LOGGER.warning(f"[gps] failed to login. response code: {response.status}")
+            self.reset_session()
             raise AuthenticationError("Invalid username or password")
 
     async def get_user_id(self):
@@ -145,17 +176,22 @@ class GpsClient():
             _LOGGER.debug("Version: %s", VERSION)
         else:
             _LOGGER.debug("renew login")
+            self.reset_session()
             await self.get_csrf()
             await self.login()
             await self.get_user_id()
 
-        try:
+        devices = await self.get_device_data()
+        if not self.cookie:
+            # the session was rejected: log in again right away instead of
+            # reporting no devices until the next poll
+            _LOGGER.info("[update] session expired, logging in again")
+            self.reset_session()
+            await self.get_csrf()
+            await self.login()
+            await self.get_user_id()
             devices = await self.get_device_data()
-            return devices
-        except AuthenticationError:
-            _LOGGER.warning("login failed")
-            self.cookie = ""
-            self.csrf = ""
+        return devices
 
     async def get_device_data(self):
         url = CONFIG["device_url"].replace("%account%", self.account_id)
